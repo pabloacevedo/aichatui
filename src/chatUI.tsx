@@ -47,6 +47,22 @@ export default function ChatInterface({
         console.log(messages)
     }, [messages])
 
+    const [displayedText, setDisplayedText] = useState('');
+    const welcomeText = '¿En qué te puedo ayudar?';
+
+    useEffect(() => {
+        let index = 0;
+        const interval = setInterval(() => {
+            setDisplayedText((prev) => prev + welcomeText[index]);
+            index++;
+            if (index === welcomeText.length) {
+                clearInterval(interval);
+            }
+        }, 100); // Cambia el tiempo para ajustar la velocidad del efecto
+
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <div className={`flex h-screen bg-background ${darkMode}`}>
             <Sidebar
@@ -58,54 +74,59 @@ export default function ChatInterface({
                 darkMode={darkMode}
             />
             {/* Chat Area */}
-            <div className="flex-1 flex flex-col">
-                <ScrollArea className="flex-grow p-4">
-                    <div className="space-y-4">
-                        {messages.map((message, index) => (
-                            <div
-                                key={index}
-                                className={`flex items-start ${message.role === 'user' ? 'justify-end' : 'justify-start'
-                                    }`}
-                            >
-                                {message.role === 'assistant' && (
-                                    <Avatar className="mr-2">
-                                        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="AI" />
-                                        <AvatarFallback className="dark:text-white">AI</AvatarFallback>
-                                    </Avatar>
-                                )}
+            <div className="flex-1 flex flex-col w-full max-w-4xl mx-auto p-4">
+                {messages.length > 0 ?
+                    <ScrollArea className="flex-grow p-4">
+                        <div className="space-y-4">
+                            {messages.map((message, index) => (
                                 <div
-                                    className={`max-w-[70%] p-2 rounded-lg ${message.role === 'user'
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'bg-secondary text-secondary-foreground'
+                                    key={index}
+                                    className={`flex items-start ${message.role === 'user' ? 'justify-end' : 'justify-start'
                                         }`}
                                 >
-                                    {message.content}
+                                    {message.role === 'assistant' && (
+                                        <Avatar className="mr-2">
+                                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="AI" />
+                                            <AvatarFallback className="dark:text-white">AI</AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                    <div
+                                        className={`max-w-[70%] p-2 rounded-lg ${message.role === 'user'
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'bg-secondary text-secondary-foreground'
+                                            }`}
+                                    >
+                                        {message.content}
+                                    </div>
+                                    {message.role === 'user' && (
+                                        <Avatar className="ml-2">
+                                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" className="dark:text-white" />
+                                            <AvatarFallback className="dark:text-white">
+                                                <User2 className="h-4 w-4" />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    )}
                                 </div>
-                                {message.role === 'user' && (
-                                    <Avatar className="ml-2">
-                                        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" className="dark:text-white" />
-                                        <AvatarFallback className="dark:text-white">
-                                            <User2 className="h-4 w-4" />
-                                        </AvatarFallback>
+                            ))}
+                            {isTyping && (
+                                <div className="flex items-start">
+                                    <Avatar className="mr-2">
+                                        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="AI" />
+                                        <AvatarFallback>AI</AvatarFallback>
                                     </Avatar>
-                                )}
-                            </div>
-                        ))}
-                        {isTyping && (
-                            <div className="flex items-start">
-                                <Avatar className="mr-2">
-                                    <AvatarImage src="/placeholder.svg?height=40&width=40" alt="AI" />
-                                    <AvatarFallback>AI</AvatarFallback>
-                                </Avatar>
-                                <div className="bg-secondary text-secondary-foreground p-2 rounded-lg">
-                                    Escribiendo...
+                                    <div className="bg-secondary text-secondary-foreground p-2 rounded-lg">
+                                        Escribiendo...
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
+                    </ScrollArea> :
+                    <div className='flex-grow p-4 items-center content-center justify-center'>
+                        <h1 className='text-2xl font-bold text-white text-center'>{displayedText}</h1>
                     </div>
-                </ScrollArea>
-                <div className="p-4 border-t">
+                }
+                <div className="p-4">
                     <MessageForm onSendMessage={onSendMessage} />
                 </div>
             </div>

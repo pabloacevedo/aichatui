@@ -61,7 +61,7 @@ export default function Sidebar({
                         <span className="sr-only">Abrir configuración</span>
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-56">
+                <PopoverContent className="w-56 bg-secondary">
                     <div className="flex flex-col space-y-4">
                         <h3 className="font-medium leading-none">Configuración</h3>
                         <div className="flex items-center space-x-2">
